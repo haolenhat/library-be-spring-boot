@@ -1,0 +1,10 @@
+package com.example.librabry_spring_boot.repository;
+
+import com.example.librabry_spring_boot.model.LoanRecord;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface LoanRecordRepository extends JpaRepository<LoanRecord, Integer> {
+    List<LoanRecord> findByStatusIn(List<String> statuses);
+}

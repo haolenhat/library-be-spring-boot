@@ -93,10 +93,11 @@ public class UserService {
                 user -> new UserResponseDTO(
                         user.getUserId(),
                         user.getFullName(),
-                        user.getPhone(),
                         user.getEmail(),
+                        user.getPhone(), 
                         user.getRole().toString()
                 )
+
         ).collect(Collectors.toList());
     }
 

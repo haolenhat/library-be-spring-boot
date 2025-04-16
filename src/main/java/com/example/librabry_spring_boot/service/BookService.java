@@ -10,5 +10,5 @@ public interface BookService {
     Book addBook(BookRequest bookRequest);
     public void deleteBookById(Integer id);
     public List<Book> getAllBook();
-    public Book updateBook(Integer id, Book updatedBook);
+    public Book updateBookById(Integer id, BookRequest request);
 }

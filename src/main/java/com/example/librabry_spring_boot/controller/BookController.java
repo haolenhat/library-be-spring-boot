@@ -65,16 +65,11 @@ public class BookController {
 
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable Integer id, @RequestBody Book updatedBook) {
-        try {
-            Book book = bookService.updateBook(id, updatedBook);
-            return ResponseEntity.ok("Cập nhật sách thành công:"+book);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Lỗi khi cập nhật sách: " + e.getMessage());
-        }
+    public ResponseEntity<Book> updateBookById(@PathVariable Integer id, @RequestBody BookRequest request) {
+        Book updatedBook = bookService.updateBookById(id, request);
+        return ResponseEntity.ok(updatedBook);
     }
+
+
 
 }

@@ -88,25 +88,53 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll();
     }
 
-    // Sửa thông tin sách
-    public Book updateBook(Integer id, Book updatedBook) {
-        return bookRepository.findById(id).map(book -> {
-            book.setTitle(updatedBook.getTitle());
-            book.setLinkImg(updatedBook.getLinkImg());
-            book.setAvailableCopies(updatedBook.getAvailableCopies());
-            book.setDescription(updatedBook.getDescription());
 
-            // Kiểm tra và cập nhật nhà xuất bản
-            Publisher publisher = updatedBook.getPublisher();
-            if (publisher != null) {
-                String publisherName = publisher.getPublisherName() != null ? publisher.getPublisherName().trim() : "Unknown Publisher";
-                publisher.setPublisherName(publisherName);
-                book.setPublisher(publisher);
-            }
+    @Transactional
+    @Override
+    public Book updateBookById(Integer id, BookRequest request) {
+        // Tìm sách theo ID
+        Book existingBook = bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sách với ID: " + id));
 
-            // Cập nhật thể loại sách
-            book.setCategory(updatedBook.getCategory());
-            return bookRepository.save(book);
-        }).orElseThrow(() -> new RuntimeException("Không tìm thấy sách với ID: " + id));
+        // Cập nhật các trường thông tin
+        existingBook.setTitle(request.getTitle());
+        existingBook.setLinkImg(request.getLinkImg());
+        existingBook.setAvailableCopies(request.getAvailableCopies());
+        existingBook.setDescription(request.getDescription());
+
+        // Xử lý Publisher
+        Publisher publisher = publisherRepository.findByPublisherNameIgnoreCase(request.getPublisherName())
+                .orElseGet(() -> {
+                    Publisher newPublisher = new Publisher();
+                    newPublisher.setPublisherName(request.getPublisherName());
+                    return publisherRepository.save(newPublisher);
+                });
+        existingBook.setPublisher(publisher);
+
+        // Xử lý Category
+        BookCategory category = categoryRepository.findByCategoryName(request.getCategoryName())
+                .orElseGet(() -> {
+                    BookCategory newCategory = new BookCategory();
+                    newCategory.setCategoryName(request.getCategoryName());
+                    return categoryRepository.save(newCategory);
+                });
+        existingBook.setCategory(category);
+
+        // Xử lý danh sách tác giả
+        List<Author> authors = new ArrayList<>();
+        for (String authorName : request.getAuthorNames()) {
+            Author author = authorRepository.findByAuthorName(authorName)
+                    .orElseGet(() -> {
+                        Author newAuthor = new Author();
+                        newAuthor.setAuthorName(authorName);
+                        return authorRepository.save(newAuthor);
+                    });
+            authors.add(author);
+        }
+        existingBook.setAuthors(authors);
+
+        // Lưu thông tin đã cập nhật
+        return bookRepository.save(existingBook);
     }
+
 }

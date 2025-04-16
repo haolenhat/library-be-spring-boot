@@ -4,6 +4,7 @@ package com.example.librabry_spring_boot.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,8 +30,9 @@ public class LoanRecord {
 
     private BigDecimal lostOrDamagedFee;
 
-    @OneToMany(mappedBy = "loanRecord", cascade = CascadeType.ALL)
-    private List<LoanCard> loanCards;
+    @OneToMany(mappedBy = "loanRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LoanCard> loanCards = new ArrayList<>();
+
 
 
 

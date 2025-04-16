@@ -147,7 +147,6 @@ public class LoanRecordService {
             record.setReturnDate(requestDTO.getReturnDate());
         }
 
-        loanRecordRepository.save(record);
 
         // Xử lý LoanCard
         for (LoanRecordRequestDTO.LoanCardInput cardInput : requestDTO.getLoanCards()) {
@@ -173,6 +172,7 @@ public class LoanRecordService {
             bookRepository.save(book);
         }
 
+        loanRecordRepository.save(record);
         return convertToDTO(record); // Trả về DTO đã tạo
     }
 

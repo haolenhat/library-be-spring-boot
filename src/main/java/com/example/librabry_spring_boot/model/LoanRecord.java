@@ -4,11 +4,11 @@ package com.example.librabry_spring_boot.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "loan_records")
+// table dùng để ghi thông tin tổng thể của mượn sách
 public class LoanRecord {
 
     @Id
@@ -30,9 +30,8 @@ public class LoanRecord {
 
     private BigDecimal lostOrDamagedFee;
 
-    @OneToMany(mappedBy = "loanRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LoanCard> loanCards = new ArrayList<>();
-
+    @OneToMany(mappedBy = "loanRecord", cascade = CascadeType.ALL)
+    private List<LoanCard> loanCards;
 
 
 

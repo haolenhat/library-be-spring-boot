@@ -28,7 +28,7 @@ public class LoanRecordService {
 
     private final LoanCardRepository loanCardRepository;
 
-    @PostConstruct
+
     public void init() {
         updateOverdueStatuses(); // chạy ngay khi app vừa start
     }
@@ -114,7 +114,6 @@ public class LoanRecordService {
     }
 
     // tạo phiếu mượn
-    @Transactional
     public LoanRecordResponseDTO createLoanRecord(LoanRecordRequestDTO requestDTO) {
         // Tìm hoặc tạo Borrower
         Borrower borrower = borrowerRepository.findByBorrowerCode(requestDTO.getBorrowerCode())
@@ -129,31 +128,28 @@ public class LoanRecordService {
                     return borrowerRepository.save(newBorrower);
                 });
 
-        // Tìm thủ thư
         User librarian = userRepository.findById(
                 requestDTO.getLibrarianId().longValue() // Ép Integer sang Long
         ).orElseThrow(() -> new RuntimeException("Librarian không tồn tại"));
 
-        // Tạo phiếu mượn mới
         LoanRecord record = new LoanRecord();
         record.setBorrower(borrower);
         record.setLibrarian(librarian);
-        record.setBorrowDate(LocalDateTime.now()); // Ngày mượn là thời gian hiện tại
+        // Thay đổi ở đây để sử dụng thời gian hiện tại
+        record.setBorrowDate(LocalDateTime.now()); // Thiết lập ngày mượn là thời gian hiện tại
         record.setStatus(requestDTO.getStatus());
         record.setLostOrDamagedFee(requestDTO.getLostOrDamagedFee());
 
-        // Nếu không truyền ngày trả => mặc định +5 ngày
+        // Nếu returnDate rỗng => +5 ngày
         if (requestDTO.getReturnDate() == null) {
-            record.setReturnDate(record.getBorrowDate().plusDays(5));
+            record.setReturnDate(record.getBorrowDate().plusDays(5)); // Thiết lập ngày trả là 5 ngày sau ngày mượn
         } else {
             record.setReturnDate(requestDTO.getReturnDate());
         }
 
-        // Lưu trước để có ID
         loanRecordRepository.save(record);
-        loanRecordRepository.flush(); // Đảm bảo record được persist
 
-        // Xử lý từng LoanCard
+        // Xử lý LoanCard
         for (LoanRecordRequestDTO.LoanCardInput cardInput : requestDTO.getLoanCards()) {
             Book book = bookRepository.findById(cardInput.getBookId())
                     .orElseThrow(() -> new RuntimeException("Book không tồn tại"));
@@ -170,18 +166,14 @@ public class LoanRecordService {
             card.setBook(book);
             card.setQuantity(soLuongMuon);
 
-            // Gán vào LoanRecord (nếu có quan hệ 2 chiều)
-            record.getLoanCards().add(card);
+            loanCardRepository.save(card);
 
-            // Cập nhật số lượng sách
+            // Cập nhật số lượng sách còn lại
             book.setAvailableCopies(soLuongConLai - soLuongMuon);
             bookRepository.save(book);
         }
 
-        // Lưu lại LoanRecord để lưu luôn các LoanCard (nếu có CascadeType.ALL)
-        loanRecordRepository.save(record);
-
-        return convertToDTO(record);
+        return convertToDTO(record); // Trả về DTO đã tạo
     }
 
     // tự động cập nhật

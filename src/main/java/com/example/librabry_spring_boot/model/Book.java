@@ -36,7 +36,8 @@ public class Book {
     )
     private List<Author> authors;
 
-
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<LoanCard> loanCards;
 
     public Book() {
     }

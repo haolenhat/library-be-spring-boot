@@ -70,6 +70,8 @@ public class BookController {
         return ResponseEntity.ok(updatedBook);
     }
 
-
-
+    @GetMapping("/count")
+    public ResponseEntity<?> countUnavailable(){
+        return ResponseEntity.ok(bookService.countUnavailable());
+    }
 }

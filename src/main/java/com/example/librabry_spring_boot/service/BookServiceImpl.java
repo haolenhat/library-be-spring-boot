@@ -1,5 +1,6 @@
 package com.example.librabry_spring_boot.service;
 
+import com.example.librabry_spring_boot.dto.BookBorrowedCountDTO;
 import com.example.librabry_spring_boot.dto.BookRequest;
 import com.example.librabry_spring_boot.model.*;
 import com.example.librabry_spring_boot.repository.AuthorRepository;
@@ -137,4 +138,8 @@ public class BookServiceImpl implements BookService {
         return bookRepository.save(existingBook);
     }
 
+    @Override
+    public List<BookBorrowedCountDTO> countUnavailable() {
+        return bookRepository.countUnavailable();
+    }
 }

@@ -29,15 +29,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Tắt CSRF để test API
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/users/**",
-                                "/api/books/**",
-                                "/api/authors/**",
-                                "/api/categories/**",
-                                "/api/publishers/**",
-                                "/api/loan-records/**",
-                                "/api/overdue/**"
-                        ).permitAll() // Cho phép đăng nhập & đăng ký
-                        .requestMatchers("/api/**").hasAuthority("ADMIN") // Các API khác chỉ USER mới được phép truy cập
+                                "/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 );
 
